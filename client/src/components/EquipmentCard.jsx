@@ -26,6 +26,48 @@ export default function EquipmentCard({ item, onClick, onDelete }) {
           ['Impedance', item.ict?.impedancePercent ? `${item.ict.impedancePercent}%` : null],
           ['Cooling', item.ict?.cooling],
         ]
+      case 'PT':
+        return [
+          ['Rated Voltage', item.pt?.ratedVoltageKV ? `${item.pt.ratedVoltageKV} kV` : null],
+          ['Ratio', item.pt?.ratio],
+          ['Accuracy (M)', item.pt?.accuracyMetering],
+          ['Manufacturer', item.pt?.manufacturer],
+        ]
+      case 'CB':
+        return [
+          ['Rated Voltage', item.cb?.ratedVoltageKV ? `${item.cb.ratedVoltageKV} kV` : null],
+          ['Rated Current', item.cb?.ratedCurrentA ? `${item.cb.ratedCurrentA} A` : null],
+          ['Type', item.cb?.type],
+          ['Manufacturer', item.cb?.manufacturer],
+        ]
+      case 'ISOLATOR':
+        return [
+          ['Rated Voltage', item.isolator?.ratedVoltageKV ? `${item.isolator.ratedVoltageKV} kV` : null],
+          ['Rated Current', item.isolator?.ratedCurrentA ? `${item.isolator.ratedCurrentA} A` : null],
+          ['Type', item.isolator?.type],
+          ['Manufacturer', item.isolator?.manufacturer],
+        ]
+      case 'LA':
+        return [
+          ['Rated Voltage', item.la?.ratedVoltageKV ? `${item.la.ratedVoltageKV} kV` : null],
+          ['Energy Absorption', item.la?.energyAbsorptionJ ? `${item.la.energyAbsorptionJ} J` : null],
+          ['Manufacturer', item.la?.manufacturer],
+          ['Model', item.la?.model],
+        ]
+      case 'BUSBAR':
+        return [
+          ['Rated Voltage', item.busbar?.ratedVoltageKV ? `${item.busbar.ratedVoltageKV} kV` : null],
+          ['Rated Current', item.busbar?.ratedCurrentA ? `${item.busbar.ratedCurrentA} A` : null],
+          ['Material', item.busbar?.material],
+          ['Manufacturer', item.busbar?.manufacturer],
+        ]
+      case 'WAVETRAP':
+        return [
+          ['Rated Voltage', item.wavetrap?.ratedVoltageKV ? `${item.wavetrap.ratedVoltageKV} kV` : null],
+          ['Frequency', item.wavetrap?.frequencyHz ? `${item.wavetrap.frequencyHz} Hz` : null],
+          ['Impedance', item.wavetrap?.impedanceOhm ? `${item.wavetrap.impedanceOhm} Ω` : null],
+          ['Manufacturer', item.wavetrap?.manufacturer],
+        ]
       default:
         return item.attrs?.slice(0, 3)?.map(a => [a.key, a.value]) || []
     }

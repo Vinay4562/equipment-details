@@ -1,3 +1,9 @@
+import mongoose from 'mongoose';
+
+// Remove cached old and new equipment models to avoid schema conflicts
+delete mongoose.models['Equipment'];
+delete mongoose.models['EquipmentV2'];
+
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
@@ -6,6 +12,7 @@ import { fileURLToPath } from 'url';
 import { connectDB } from './db.js';
 import feederRoutes from './routes/feederRoutes.js';
 import equipmentRoutes from './routes/equipmentRoutes.js';
+import Equipment from './models/EquipmentV2.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,11 +30,12 @@ app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
 // Routes
 app.use('/api/feeders', feederRoutes);
-app.use('/api/equipment', equipmentRoutes);  // ✅ singular
+app.use('/api/equipment', equipmentRoutes); // ✅ singular
 
 const start = async () => {
   await connectDB();
   const port = process.env.PORT || 5000;
   app.listen(port, () => console.log(`🚀 API running on http://localhost:${port}`));
 };
+
 start();

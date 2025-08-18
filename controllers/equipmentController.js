@@ -1,4 +1,4 @@
-import Equipment from '../models/Equipment.js';
+import Equipment from '../models/EquipmentV2.js';
 import Feeder from '../models/Feeder.js';
 
 // Create equipment
@@ -8,6 +8,21 @@ export const createEquipment = async (req, res) => {
     const feeder = await Feeder.findById(feederId);
     if (!feeder) return res.status(400).json({ error: 'Invalid feederId' });
 
+    let parsedPayload = {};
+    if (payload) {
+      parsedPayload = JSON.parse(payload);
+      console.log('Parsed payload:', parsedPayload);
+
+      // Check if any nested equipment block like 'cb' is wrongly a string
+      const nestedKeys = ['ct', 'cvt', 'ict', 'pt', 'cb', 'isolator', 'la', 'busbar', 'wavetrap'];
+      for (const key of nestedKeys) {
+        if (key in parsedPayload && typeof parsedPayload[key] === 'string') {
+          console.warn(`Warning: Payload key "${key}" is a string but should be an object.`);
+          return res.status(400).json({ error: `Invalid payload: "${key}" field must be an object, not string.` });
+        }
+      }
+    }
+
     const doc = new Equipment({
       station: station || '400kV Shankarpally',
       voltage,
@@ -16,7 +31,7 @@ export const createEquipment = async (req, res) => {
       equipmentType,
       title,
       imageUrl: req.file ? `/uploads/${req.file.filename}` : undefined,
-      ...(payload ? JSON.parse(payload) : {}),
+      ...parsedPayload,
     });
 
     const saved = await doc.save();
