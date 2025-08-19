@@ -232,7 +232,7 @@ export default function ViewerPage() {
               {selectedItem.imageUrl && (
                 <div className="flex justify-center">
                   <img
-                    src={`http://localhost:5000${selectedItem.imageUrl}`}
+                    src={`${import.meta.env.VITE_API_BASE?.replace(/\/$/, '') || ''}${selectedItem.imageUrl}`}
                     alt={selectedItem.title}
                     className="max-w-full max-h-64 object-contain rounded-lg border border-gray-200 shadow-sm"
                     onError={(e) => {
