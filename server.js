@@ -13,6 +13,7 @@ import { connectDB } from './db.js';
 import feederRoutes from './routes/feederRoutes.js';
 import equipmentRoutes from './routes/equipmentRoutes.js';
 import Equipment from './models/EquipmentV2.js';
+import { createToken, requireAuth } from './middleware/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,9 +29,26 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Health check
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
+// Auth: simple server-side credential check using .env
+app.post('/api/auth/login', (req, res) => {
+  const { username, password } = req.body || {};
+  const envUser = process.env.ENTRY_USERNAME;
+  const envPass = process.env.ENTRY_PASSWORD;
+  if (!envUser || !envPass) return res.status(500).json({ error: 'Credentials not configured' });
+  if (username === envUser && password === envPass) {
+    const token = createToken(username);
+    return res.json({ token });
+  }
+  return res.status(401).json({ error: 'Invalid credentials' });
+});
+
 // Routes
 app.use('/api/feeders', feederRoutes);
-app.use('/api/equipment', equipmentRoutes); // ✅ singular
+// Protect equipment write operations
+app.use('/api/equipment', (req, res, next) => {
+  if (req.method === 'POST' || req.method === 'DELETE') return requireAuth(req, res, next);
+  next();
+}, equipmentRoutes); // ✅ singular
 
 const start = async () => {
   await connectDB();

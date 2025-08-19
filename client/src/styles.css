@@ -40,6 +40,12 @@ body::before {
   to { background-position: 60px 60px; }
 }
 
+/* Simple entrance animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+@keyframes slideUp { from { opacity: 0; transform: translateY(12px);} to { opacity: 1; transform: translateY(0);} }
+.animate-fadeIn { animation: fadeIn .5s ease both; }
+.animate-slideUp { animation: slideUp .4s ease both; }
+
 /* ===== Navigation Bar ===== */
 nav {
   backdrop-filter: blur(12px);
