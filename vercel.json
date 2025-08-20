@@ -7,9 +7,9 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" },
     { "src": "/uploads/(.*)", "dest": "/api/index.js" },
-    { "src": "/assets/(.*)", "dest": "/assets/$1" },
-    { "src": "/images/(.*)", "dest": "/images/$1" },
-    { "src": "/(.*)\\.(css|js|png|jpg|jpeg|svg|ico|webp|woff|woff2|ttf|eot)", "dest": "/$1" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/assets/(.*)", "dest": "/client/dist/assets/$1" },
+    { "src": "/images/(.*)", "dest": "/client/dist/images/$1" },
+    { "src": "/(.*)\\.(css|js|png|jpg|jpeg|svg|ico|webp|woff|woff2|ttf|eot)", "dest": "/client/dist/$1" },
+    { "src": "/(.*)", "dest": "/client/dist/index.html" }
   ]
 }
