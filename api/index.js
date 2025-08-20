@@ -13,11 +13,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
+// Normalize path: strip leading "/api" if present (Vercel route may forward full path)
+app.use((req, _res, next) => {
+  if (req.url === '/api') req.url = '/';
+  else if (req.url.startsWith('/api/')) req.url = req.url.slice(4);
+  next();
+});
+
 // Static files (note: serverless storage is ephemeral)
 const uploadsPath = process.env.VERCEL ? '/tmp/uploads' : path.join(process.cwd(), 'uploads');
 app.use('/uploads', express.static(uploadsPath));
 
-// Health check endpoint (under the function base "/api")
+// Health check endpoint
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
 // Auth (function base is "/api")
