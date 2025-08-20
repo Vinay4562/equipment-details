@@ -2,19 +2,20 @@
   "version": 2,
   "builds": [
     { "src": "api/index.js", "use": "@vercel/node" },
-    { "src": "client/package.json", "use": "@vercel/static-build" }
+    { "src": "client/package.json", "use": "@vercel/static-build", "config": { "distDir": "client/dist" } }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" },
     { "src": "/uploads/(.*)", "dest": "/api/index.js" },
     { "src": "/assets/(.*)", "dest": "/client/dist/assets/$1" },
-    { "src": "/(.*)\\.(css|js|png|jpg|jpeg|svg|ico|webp|woff|woff2|ttf)", "dest": "/client/dist/$1.$2" },
+    { "src": "/images/(.*)", "dest": "/client/dist/images/$1" },
+    { "src": "/(.*)\\.(css|js|png|jpg|jpeg|svg|ico|webp|woff|woff2|ttf|eot)", "dest": "/client/dist/$1" },
     { "src": "/(.*)", "dest": "/client/dist/index.html" }
   ],
   "env": {
-    "MONGO_URI": "@MONGO_URI",
-    "ENTRY_USERNAME": "@ENTRY_USERNAME",
-    "ENTRY_PASSWORD": "@ENTRY_PASSWORD",
-    "JWT_SECRET": "@JWT_SECRET"
+    "MONGO_URI": "@mongo_uri",
+    "ENTRY_USERNAME": "@entry_username", 
+    "ENTRY_PASSWORD": "@entry_password",
+    "JWT_SECRET": "@jwt_secret"
   }
 }

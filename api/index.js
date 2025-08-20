@@ -14,7 +14,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 // Static files (note: serverless storage is ephemeral)
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+const uploadsPath = process.env.VERCEL ? '/tmp/uploads' : path.join(process.cwd(), 'uploads');
+app.use('/uploads', express.static(uploadsPath));
 
 // Health check endpoint (under the function base "/api")
 app.get('/health', (_req, res) => res.json({ ok: true }));

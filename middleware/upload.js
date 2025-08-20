@@ -2,7 +2,8 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 
-const uploadsDir = path.join(process.cwd(), 'server', 'uploads');
+// For Vercel serverless, use /tmp directory which is writable
+const uploadsDir = process.env.VERCEL ? '/tmp/uploads' : path.join(process.cwd(), 'server', 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
 const storage = multer.diskStorage({
