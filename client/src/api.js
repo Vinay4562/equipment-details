@@ -24,7 +24,8 @@ export const ENTRY_USERNAME = import.meta.env.VITE_ENTRY_USERNAME || 'Shankarpal
 // Resolve server-hosted upload URLs correctly across dev/prod
 export function resolveUploadUrl(imagePath) {
   if (!imagePath) return '';
-  if (/^https?:\/\//i.test(imagePath)) return imagePath;
+  if (/^(?:https?:)?\/\//i.test(imagePath)) return imagePath; // absolute http(s)
+  if (/^data:/i.test(imagePath)) return imagePath; // data URI
   const origin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : (typeof window !== 'undefined' ? window.location.origin : '');
   return `${origin}${imagePath}`;
 }

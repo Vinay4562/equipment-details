@@ -23,6 +23,21 @@ export const createEquipment = async (req, res) => {
       }
     }
 
+    // Determine image URL
+    let imageUrl;
+    if (req.file) {
+      if (process.env.VERCEL) {
+        // On Vercel: you must store persistently (e.g., Vercel Blob). Here we fallback to base64 data URL for now if Blob not configured.
+        // Better: integrate @vercel/blob and store to persistent storage, then set imageUrl to returned public URL.
+        const base64 = req.file.buffer.toString('base64');
+        const mime = req.file.mimetype || 'image/png';
+        imageUrl = `data:${mime};base64,${base64}`;
+      } else {
+        // Local/dev: stored on disk by multer
+        imageUrl = `/uploads/${req.file.filename}`;
+      }
+    }
+
     const doc = new Equipment({
       station: station || '400kV Shankarpally',
       voltage,
@@ -30,7 +45,7 @@ export const createEquipment = async (req, res) => {
       feederName: feeder.name,
       equipmentType,
       title,
-      imageUrl: req.file ? `/uploads/${req.file.filename}` : undefined,
+      imageUrl,
       ...parsedPayload,
     });
 
