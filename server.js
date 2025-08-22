@@ -23,8 +23,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: process.env.CLIENT_ORIGIN?.split(',') || '*' }));
 
-// Static for uploaded images
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Static for uploaded images (ensure it points to server/uploads where multer stores files)
+app.use('/uploads', express.static(path.join(__dirname, 'server', 'uploads')));
 
 // Health check
 app.get('/api/health', (_req, res) => res.json({ ok: true }));

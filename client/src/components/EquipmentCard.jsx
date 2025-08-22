@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { deleteEquipment } from '../api'
+import { api, deleteEquipment, ENTRY_USERNAME, resolveUploadUrl } from '../api'
 
 export default function EquipmentCard({ item, onClick, onDelete }) {
   const [deleting, setDeleting] = useState(false)
@@ -73,17 +73,34 @@ export default function EquipmentCard({ item, onClick, onDelete }) {
     }
   })()
 
-  // Backend URL for uploaded images
-  const imageSrc = item.imageUrl
-    ? `http://localhost:5000${item.imageUrl}` // Fixed URL construction
-    : "/images/placeholder.svg" // fallback
+  // Resolve uploaded image URL across environments
+  const imageSrc = item.imageUrl ? resolveUploadUrl(item.imageUrl) : "/images/placeholder.svg"
+
+  const ensureAuthForDelete = async () => {
+    // If token exists, assume valid and proceed
+    const token = localStorage.getItem('authToken')
+    if (token) return true
+    // Ask for sign-in password
+    const pwd = prompt('Enter sign-in password to delete this equipment:')
+    if (!pwd) return false
+    try {
+      const res = await api.post('/auth/login', { username: ENTRY_USERNAME, password: pwd })
+      localStorage.setItem('authToken', res.data.token)
+      return true
+    } catch (e) {
+      alert('Authentication failed. Deletion cancelled.')
+      return false
+    }
+  }
 
   const handleDelete = async (e) => {
-    e.stopPropagation() // Prevent card click when delete button is clicked
+    e.stopPropagation()
     if (!confirm(`Are you sure you want to delete "${item.title}"?`)) return
-    
+
     try {
       setDeleting(true)
+      const ok = await ensureAuthForDelete()
+      if (!ok) return
       await deleteEquipment(item._id)
       onDelete && onDelete(item._id)
     } catch (error) {
@@ -108,7 +125,7 @@ export default function EquipmentCard({ item, onClick, onDelete }) {
                 alt={item.title}
                 className="w-full h-40 object-cover rounded-lg border border-blue-500/20 mb-3"
                 onError={(e) => {
-                  e.target.src = "/images/placeholder.png"
+                  e.currentTarget.src = "/images/placeholder.png"
                 }}
               />
               {/* Transparent small label */}

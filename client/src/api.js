@@ -18,6 +18,17 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Entry username for privileged actions (used when prompting only for password)
+export const ENTRY_USERNAME = import.meta.env.VITE_ENTRY_USERNAME || 'Shankarpally400kv';
+
+// Resolve server-hosted upload URLs correctly across dev/prod
+export function resolveUploadUrl(imagePath) {
+  if (!imagePath) return '';
+  if (/^https?:\/\//i.test(imagePath)) return imagePath;
+  const origin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : (typeof window !== 'undefined' ? window.location.origin : '');
+  return `${origin}${imagePath}`;
+}
+
 export const fetchFeeders = (voltage) => api.get('/feeders', { params: { voltage } });
 export const seedFeeders = () => api.post('/feeders/seed');
 export const createEquipment = (formData) => api.post('/equipment', formData, { headers: { 'Content-Type': 'multipart/form-data' }});

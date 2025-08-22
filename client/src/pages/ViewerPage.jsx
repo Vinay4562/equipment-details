@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import FeederPicker from '../components/FeederPicker.jsx'
 import EquipmentCard from '../components/EquipmentCard.jsx'
 import EmptyState from '../components/EmptyState.jsx'
-import { listEquipment, deleteEquipment } from '../api.js'
+import { listEquipment, deleteEquipment, api, ENTRY_USERNAME, resolveUploadUrl } from '../api.js'
 
 export default function ViewerPage() {
   const [selection, setSelection] = useState({})
@@ -26,6 +26,21 @@ export default function ViewerPage() {
     setItems(prev => prev.filter(item => item._id !== deletedId))
     if (selectedItem && selectedItem._id === deletedId) {
       setSelectedItem(null)
+    }
+  }
+
+  const ensureAuth = async () => {
+    const token = localStorage.getItem('authToken')
+    if (token) return true
+    const pwd = prompt('Enter sign-in password to proceed:')
+    if (!pwd) return false
+    try {
+      const res = await api.post('/auth/login', { username: ENTRY_USERNAME, password: pwd })
+      localStorage.setItem('authToken', res.data.token)
+      return true
+    } catch {
+      alert('Authentication failed.')
+      return false
     }
   }
 
@@ -232,11 +247,11 @@ export default function ViewerPage() {
               {selectedItem.imageUrl && (
                 <div className="flex justify-center">
                   <img
-                    src={`${import.meta.env.VITE_API_BASE?.replace(/\/$/, '') || ''}${selectedItem.imageUrl}`}
+                    src={resolveUploadUrl(selectedItem.imageUrl)}
                     alt={selectedItem.title}
                     className="max-w-full max-h-64 object-contain rounded-lg border border-gray-200 shadow-sm"
                     onError={(e) => {
-                      e.target.style.display = 'none'
+                      e.currentTarget.style.display = 'none'
                     }}
                   />
                 </div>
@@ -288,6 +303,8 @@ export default function ViewerPage() {
                   className="px-6 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
                   onClick={async () => {
                     if (!confirm(`Are you sure you want to delete "${selectedItem.title}"?`)) return
+                    const ok = await ensureAuth()
+                    if (!ok) return
                     try {
                       await deleteEquipment(selectedItem._id)
                       handleDelete(selectedItem._id)
