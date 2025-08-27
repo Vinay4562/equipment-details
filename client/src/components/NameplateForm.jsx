@@ -7,7 +7,6 @@ export default function NameplateForm({ selection }){
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const [signedIn, setSignedIn] = useState(!!localStorage.getItem('authToken'))
-  const [inactivityTimer, setInactivityTimer] = useState(null)
 
   const [fields, setFields] = useState({})
 
@@ -20,31 +19,7 @@ export default function NameplateForm({ selection }){
     return () => window.removeEventListener('storage', sync)
   }, [])
 
-  // Auto sign-out after 2 minutes of inactivity
-  useEffect(() => {
-    if (!signedIn) return
 
-    const resetTimer = () => {
-      if (inactivityTimer) clearTimeout(inactivityTimer)
-      const timer = setTimeout(() => {
-        localStorage.removeItem('authToken')
-        setSignedIn(false)
-        alert('Signed out due to inactivity')
-      }, 2 * 60 * 1000) // 2 minutes
-      setInactivityTimer(timer)
-    }
-
-    // Reset timer on user activity
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
-    events.forEach(event => document.addEventListener(event, resetTimer, true))
-
-    resetTimer() // Start initial timer
-
-    return () => {
-      if (inactivityTimer) clearTimeout(inactivityTimer)
-      events.forEach(event => document.removeEventListener(event, resetTimer, true))
-    }
-  }, [signedIn, inactivityTimer])
 
   const specFields = {
     CT: [
