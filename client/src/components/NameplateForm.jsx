@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { createEquipment } from '../api'
+import LoadingSpinner from './LoadingSpinner.jsx'
 
 export default function NameplateForm({ selection }){
   const [title, setTitle] = useState('')
@@ -249,7 +250,16 @@ export default function NameplateForm({ selection }){
         <input type="file" accept="image/*" onChange={e=>setImage(e.target.files?.[0]||null)} className="w-full" />
       </div>
       <div className="flex items-center gap-3">
-        <button disabled={saving} className="px-4 py-2 rounded-xl bg-black text-white dark:bg-white dark:text-black disabled:opacity-50">{saving? 'Saving…':'Save Nameplate'}</button>
+        <button disabled={saving} className="px-4 py-2 rounded-xl bg-black text-white dark:bg-white dark:text-black disabled:opacity-50 flex items-center gap-2">
+          {saving ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              Saving…
+            </>
+          ) : (
+            'Save Nameplate'
+          )}
+        </button>
         {message && <span className="text-sm opacity-80">{message}</span>}
       </div>
     </form>

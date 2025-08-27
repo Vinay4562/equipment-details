@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import FeederPicker from '../components/FeederPicker.jsx'
 import EquipmentCard from '../components/EquipmentCard.jsx'
 import EmptyState from '../components/EmptyState.jsx'
+import LoadingSpinner from '../components/LoadingSpinner.jsx'
 import { listEquipment, deleteEquipment, updateEquipment, api, ENTRY_USERNAME, resolveUploadUrl } from '../api.js'
 
 export default function ViewerPage() {
@@ -16,16 +17,24 @@ export default function ViewerPage() {
   const [savingEdit, setSavingEdit] = useState(false)
   const [signedIn, setSignedIn] = useState(!!localStorage.getItem('authToken'))
   const [fullImageUrl, setFullImageUrl] = useState(null)
+  const [loadingEquipment, setLoadingEquipment] = useState(false)
 
   useEffect(() => {
     (async () => {
       if (!selection.feederId) return
-      const res = await listEquipment({
-        feederId: selection.feederId,
-        equipmentType: selection.equipmentType,
-        q
-      })
-      setItems(res.data.items)
+      setLoadingEquipment(true)
+      try {
+        const res = await listEquipment({
+          feederId: selection.feederId,
+          equipmentType: selection.equipmentType,
+          q
+        })
+        setItems(res.data.items)
+      } catch (error) {
+        console.error('Error loading equipment:', error)
+      } finally {
+        setLoadingEquipment(false)
+      }
     })()
   }, [selection, q])
 
@@ -425,7 +434,9 @@ export default function ViewerPage() {
       </div>
 
       {/* Results */}
-      {items.length === 0 ? (
+      {loadingEquipment ? (
+        <LoadingSpinner text="Loading equipment..." />
+      ) : items.length === 0 ? (
         <EmptyState
           title="No nameplates found"
           subtitle="Try another feeder/equipment or add one in Entry tab."
