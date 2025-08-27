@@ -2,7 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { fetchFeeders, seedFeeders } from '../api'
 
 const VOLTAGES = ['400KV','220KV','ICT']
-const TYPES = ['CT','CVT','ICT','CB','ISOLATOR','LA','PT','BUSBAR','WAVETRAP']
+
+// Equipment types by voltage level
+const getEquipmentTypes = (voltage) => {
+  if (voltage === 'ICT') {
+    return ['ICT', 'CVT', 'LA', 'CT', 'CB']
+  } else {
+    // For 400KV and 220KV
+    return ['CT', 'CVT', 'CB', 'LA', 'PT', 'WAVETRAP', 'ISOLATOR']
+  }
+}
 
 export default function FeederPicker({ onChange, value }){
   const [voltage, setVoltage] = useState(value?.voltage || '400KV')
@@ -10,11 +19,21 @@ export default function FeederPicker({ onChange, value }){
   const [feederId, setFeederId] = useState(value?.feederId || '')
   const [equipmentType, setEquipmentType] = useState(value?.equipmentType || 'CT')
 
+  // Get available equipment types for current voltage
+  const availableTypes = getEquipmentTypes(voltage)
+
   useEffect(()=>{ (async()=>{
     const res = await fetchFeeders(voltage)
     setFeeders(res.data)
     if (!res.data.find(f=>f._id===feederId)) setFeederId(res.data[0]?._id||'')
   })() },[voltage])
+
+  // Reset equipment type if current selection is not available for new voltage
+  useEffect(() => {
+    if (!availableTypes.includes(equipmentType)) {
+      setEquipmentType(availableTypes[0] || 'CT')
+    }
+  }, [voltage, availableTypes, equipmentType])
 
   useEffect(()=>{ onChange && onChange({ voltage, feederId, equipmentType }) },[voltage, feederId, equipmentType])
 
@@ -36,7 +55,7 @@ export default function FeederPicker({ onChange, value }){
       <div>
         <label className="block text-sm mb-1">Equipment Type</label>
         <select value={equipmentType} onChange={e=>setEquipmentType(e.target.value)} className="w-full border rounded-xl px-3 py-2 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700">
-          {TYPES.map(t=> <option key={t} value={t}>{t}</option>)}
+          {availableTypes.map(t=> <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
     </div>
