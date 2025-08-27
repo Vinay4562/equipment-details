@@ -111,3 +111,50 @@ export const deleteEquipment = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+// Update
+export const updateEquipment = async (req, res) => {
+  try {
+    const { station, voltage, feederId, equipmentType, title, payload } = req.body;
+
+    const update = {};
+    if (station) update.station = station;
+    if (voltage) update.voltage = voltage;
+    if (feederId) {
+      const feeder = await Feeder.findById(feederId);
+      if (!feeder) return res.status(400).json({ error: 'Invalid feederId' });
+      update.feederId = feederId;
+      update.feederName = feeder.name;
+    }
+    if (equipmentType) update.equipmentType = equipmentType;
+    if (title) update.title = title;
+
+    if (req.file) {
+      if (process.env.VERCEL) {
+        const base64 = req.file.buffer.toString('base64');
+        const mime = req.file.mimetype || 'image/png';
+        update.imageUrl = `data:${mime};base64,${base64}`;
+      } else {
+        update.imageUrl = `/uploads/${req.file.filename}`;
+      }
+    }
+
+    if (payload) {
+      const parsed = JSON.parse(payload);
+      const nestedKeys = ['ct','cvt','ict','pt','cb','isolator','la','busbar','wavetrap'];
+      for (const key of nestedKeys) {
+        if (key in parsed && typeof parsed[key] === 'string') {
+          return res.status(400).json({ error: `Invalid payload: "${key}" field must be an object, not string.` });
+        }
+      }
+      Object.assign(update, parsed);
+    }
+
+    const updated = await Equipment.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });
+    if (!updated) return res.status(404).json({ error: 'Equipment not found' });
+    res.json(updated);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Server error' });
+  }
+};

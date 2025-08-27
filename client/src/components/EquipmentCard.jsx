@@ -1,16 +1,18 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { api, deleteEquipment, ENTRY_USERNAME, resolveUploadUrl } from '../api'
 
 export default function EquipmentCard({ item, onClick, onDelete }) {
   const [deleting, setDeleting] = useState(false)
+  const [signedIn, setSignedIn] = useState(!!localStorage.getItem('authToken'))
   const fields = (() => {
     switch (item.equipmentType) {
       case 'CT':
         return [
-          ['Rated Voltage', item.ct?.ratedVoltageKV ? `${item.ct.ratedVoltageKV} kV` : null],
+          ['Manufacturer', item.ct?.manufacturer],
+          ['Type', item.ct?.type],
           ['Ratio', item.ct?.ratio],
-          ['Accuracy (M)', item.ct?.accuracyMetering],
-          ['Accuracy (P)', item.ct?.accuracyProtection],
+          ['Accuracy Class', item.ct?.accuracyClass || item.ct?.accuracyMetering],
+          ['Burden', item.ct?.ratedBurdenVA ? `${item.ct.ratedBurdenVA} VA` : (item.ct?.burdenVA ? `${item.ct.burdenVA} VA` : null)],
         ]
       case 'CVT':
         return [
@@ -21,17 +23,21 @@ export default function EquipmentCard({ item, onClick, onDelete }) {
         ]
       case 'ICT':
         return [
+          ['Manufacturer', item.ict?.manufacturer],
+          ['Type', item.ict?.type],
           ['Power', item.ict?.powerMVA ? `${item.ict.powerMVA} MVA` : null],
           ['Vector', item.ict?.vectorGroup],
-          ['Impedance', item.ict?.impedancePercent ? `${item.ict.impedancePercent}%` : null],
           ['Cooling', item.ict?.cooling],
+          ['HV', item.ict?.primaryKV ? `${item.ict.primaryKV} kV` : (item.ict?.ratedVoltageAtNoLoad?.hv ? `${item.ict.ratedVoltageAtNoLoad.hv} kV` : null)],
+          ['IV', item.ict?.secondaryKV ? `${item.ict.secondaryKV} kV` : (item.ict?.ratedVoltageAtNoLoad?.iv ? `${item.ict.ratedVoltageAtNoLoad.iv} kV` : null)],
+          ['LV', item.ict?.tertiaryKV ? `${item.ict.tertiaryKV} kV` : (item.ict?.ratedVoltageAtNoLoad?.lv ? `${item.ict.ratedVoltageAtNoLoad.lv} kV` : null)],
         ]
       case 'PT':
         return [
-          ['Rated Voltage', item.pt?.ratedVoltageKV ? `${item.pt.ratedVoltageKV} kV` : null],
-          ['Ratio', item.pt?.ratio],
-          ['Accuracy (M)', item.pt?.accuracyMetering],
-          ['Manufacturer', item.pt?.manufacturer],
+          ['Type', item.pt?.type],
+          ['Primary Voltage', item.pt?.primaryVoltageKV ? `${item.pt.primaryVoltageKV} kV` : null],
+          ['Accuracy Class', item.pt?.accuracyClass],
+          ['Rated Burden', item.pt?.ratedBurdenVA ? `${item.pt.ratedBurdenVA} VA` : null],
         ]
       case 'CB':
         return [
@@ -111,6 +117,13 @@ export default function EquipmentCard({ item, onClick, onDelete }) {
     }
   }
 
+  // Keep signed-in state in sync across tabs and on sign-in/out
+  useEffect(() => {
+    const sync = () => setSignedIn(!!localStorage.getItem('authToken'))
+    window.addEventListener('storage', sync)
+    return () => window.removeEventListener('storage', sync)
+  }, [])
+
   return (
     <div className="relative group">
       <button
@@ -150,15 +163,17 @@ export default function EquipmentCard({ item, onClick, onDelete }) {
         </div>
       </button>
       
-      {/* Delete Button */}
-      <button
-        onClick={handleDelete}
-        disabled={deleting}
-        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 disabled:opacity-50"
-        title="Delete Equipment"
-      >
-        {deleting ? '⏳' : '🗑️'}
-      </button>
+      {/* Delete Button (only when signed in) */}
+      {signedIn && (
+        <button
+          onClick={handleDelete}
+          disabled={deleting}
+          className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 disabled:opacity-50"
+          title="Delete Equipment"
+        >
+          {deleting ? '⏳' : '🗑️'}
+        </button>
+      )}
     </div>
   )
 }

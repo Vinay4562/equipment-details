@@ -13,17 +13,46 @@ export default function NameplateForm({ selection }){
 
   const specFields = {
     CT: [
+      ['ct.manufacturer','Manufacturer'],
+      ['ct.type','Type / Type Designation'],
+      ['ct.serialNo','Serial No. / Sl. No. / Sr. No.'],
+      ['ct.year','Year of Manufacturing'],
+      ['ct.highestSystemVoltageKV','HSV / NSV / Rated System Voltage (kV)'],
+      ['ct.frequencyHz','Frequency (Hz)'],
+      ['ct.referenceStandard','Reference Standard / Specification'],
+      ['ct.basicInsulationLevelKVp','BIL (kVp)'],
+      ['ct.insulationLevel','Insulation Level (I.L.)'],
+      ['ct.ithKA_1s','Ith (kA/1s)'],
+      ['ct.idynKA','Idyn (kA)'],
+      ['ct.ratedThermalCurrentA','Rated Thermal Current (A)'],
+      ['ct.ratedContinuousCurrentA','Rated Continuous Current (A)'],
+      ['ct.ratedExtendedPrimaryCurrentA','Rated Extended Primary Current (A)'],
+      ['ct.ratedPrimaryCurrentA','Rated Primary Current (A)'],
+      ['ct.ratedSecondaryCurrentA','Rated Secondary Current (A)'],
+      ['ct.ratio','Primary/Secondary Ratio'],
+      ['ct.ratioOutput2000to1','2000/1 Ratio Output (if special)'],
+      ['ct.outputVA','Output (VA)'],
+      ['ct.ratedBurdenVA','Rated Burden (VA)'],
+      ['ct.accuracyClass','Accuracy Class'],
+      ['ct.isfOrAlf','I.S.F / ALF'],
+      ['ct.creepageDistanceMm','Normal/Nominal/Total Creepage Distance (mm)'],
+      ['ct.cores','Cores / Compensating Core'],
+      ['ct.primaryConnection','Primary Connection'],
+      ['ct.secondaryConnection','Secondary Connection'],
+      ['ct.resistanceAt75C_Ohm','Resistance at 75°C (Ω)'],
+      ['ct.kneePointVoltageVk','Knee Point Voltage (Vk)'],
+      ['ct.excitationCurrentAtVk_mA','Excitation/Magnetizing Current at Vk (mA)'],
+      ['ct.oilWeightKg','Oil Weight (kg)'],
+      ['ct.totalWeightKg','Total Weight (kg)'],
+      ['ct.soNo','S.O. No.'],
+      // legacy/compat
       ['ct.ratedVoltageKV','Rated Voltage (kV)'],
       ['ct.ratedCurrentA','Rated Current (A)'],
-      ['ct.ratio','Ratio (e.g., 2000/1A)'],
-      ['ct.accuracyMetering','Accuracy Metering (e.g., 0.2S)'],
-      ['ct.accuracyProtection','Accuracy Protection (e.g., 5P20)'],
+      ['ct.accuracyMetering','Accuracy Metering'],
+      ['ct.accuracyProtection','Accuracy Protection'],
       ['ct.burdenVA','Burden (VA)'],
       ['ct.shortTimeCurrentKA_3s','Short Time Current (kA/3s)'],
-      ['ct.manufacturer','Manufacturer'],
       ['ct.model','Model'],
-      ['ct.serialNo','Serial No'],
-      ['ct.year','Year'],
     ],
     CVT: [
       ['cvt.ratedVoltageKV','Rated Voltage (kV)'],
@@ -37,29 +66,92 @@ export default function NameplateForm({ selection }){
       ['cvt.year','Year'],
     ],
     ICT: [
-      ['ict.powerMVA','Power (MVA)'],
-      ['ict.primaryKV','Primary (kV)'],
-      ['ict.secondaryKV','Secondary (kV)'],
-      ['ict.tertiaryKV','Tertiary (kV)'],
+      // Basic
+      ['ict.manufacturer','Manufacturer'],
+      ['ict.type','Type'],
+      ['ict.cooling','Type of Cooling'],
+      ['ict.powerMVA','Rated Power (MVA)'],
+      
+      // Legacy voltage kV (optional)
+      ['ict.primaryKV','HV (kV)'],
+      ['ict.secondaryKV','IV (kV)'],
+      ['ict.tertiaryKV','LV (kV)'],
+      
+      // Rated Voltage at No Load
+      ['ict.ratedVoltageAtNoLoad.hv','Rated Voltage at No Load - HV (kV)'],
+      ['ict.ratedVoltageAtNoLoad.iv','Rated Voltage at No Load - IV (kV)'],
+      ['ict.ratedVoltageAtNoLoad.lv','Rated Voltage at No Load - LV (kV)'],
+      
+      // Rated Line Current
+      ['ict.ratedLineCurrent.hv','Rated Line Current - HV (A)'],
+      ['ict.ratedLineCurrent.iv','Rated Line Current - IV (A)'],
+      ['ict.ratedLineCurrent.lv','Rated Line Current - LV (A)'],
+      
+      // Other ratings
+      ['ict.numPhases','No. of Phases'],
+      ['ict.frequencyHz','Frequency (Hz)'],
+      
+      // Drawings / identifiers
+      ['ict.diagramDrgNo','Diagram Drg. No.'],
+      ['ict.ogaDrawingNo','OGA Drawing No.'],
+      ['ict.makersSerialNo','Maker\'s Serial No.'],
+      ['ict.connectionSymbol','Connection Symbol'],
+      ['ict.year','Year of Manufacture'],
+      
+      // Temperature rise
+      ['ict.temperature.maxTempRiseOilC','Max. Temperature Rise (Oil) (°C)'],
+      ['ict.temperature.maxTempRiseWindingC','Max. Temperature Rise (Winding) (°C)'],
+      ['ict.temperature.overAmbientTempC','Over Ambient Temperature (°C)'],
+      
+      // Masses & oil
+      ['ict.mass.coreAndWindingsKg','Mass of Core & Windings (kg)'],
+      ['ict.mass.totalMassKg','Total Mass (kg)'],
+      ['ict.mass.transportMassKg','Transport Mass (kg)'],
+      ['ict.mass.untankingMassKg','Untanking Mass (kg)'],
+      ['ict.mass.oilVolumeLiters','Volume of Oil (liters)'],
+      
+      // Impedance Voltage (315 MVA base at normal tap)
+      ['ict.impedanceVoltage.baseMVA','Impedance Base (MVA)'],
+      ['ict.impedanceVoltage.guaranteed.hv_iv','Impedance Voltage Guaranteed HV–IV (%)'],
+      ['ict.impedanceVoltage.guaranteed.hv_lv','Impedance Voltage Guaranteed HV–LV (%)'],
+      ['ict.impedanceVoltage.guaranteed.iv_lv','Impedance Voltage Guaranteed IV–LV (%)'],
+      ['ict.impedanceVoltage.measured.hv_iv','Impedance Voltage Measured HV–IV (%)'],
+      ['ict.impedanceVoltage.measured.hv_lv','Impedance Voltage Measured HV–LV (%)'],
+      ['ict.impedanceVoltage.measured.iv_lv','Impedance Voltage Measured IV–LV (%)'],
+      
+      // Losses
+      ['ict.losses.noLoadKW','No-Load Loss (kW)'],
+      ['ict.losses.loadKW','Load Loss (kW)'],
+      ['ict.losses.coolerKW','Cooler Loss (kW)'],
+      
+      // Insulation Level
+      ['ict.insulationLevel.hv','Insulation Level - HV'],
+      ['ict.insulationLevel.iv','Insulation Level - IV'],
+      ['ict.insulationLevel.lv','Insulation Level - LV'],
+      ['ict.insulationLevel.n','Insulation Level - N'],
+      
+      // Vector/Impedance (kept for quick view)
       ['ict.vectorGroup','Vector Group'],
       ['ict.impedancePercent','Impedance (%)'],
-      ['ict.cooling','Cooling (ONAN/ONAF)'],
-      ['ict.manufacturer','Manufacturer'],
-      ['ict.serialNo','Serial No'],
-      ['ict.year','Year'],
     ],
     PT: [
-      ['pt.ratedVoltageKV','Rated Voltage (kV)'],
-      ['pt.ratedCurrentA','Rated Current (A)'],
-      ['pt.ratio','Ratio (e.g., 2000/1A)'],
-      ['pt.accuracyMetering','Accuracy Metering (e.g., 0.2S)'],
-      ['pt.accuracyProtection','Accuracy Protection (e.g., 5P20)'],
-      ['pt.burdenVA','Burden (VA)'],
-      ['pt.shortTimeCurrentKA_3s','Short Time Current (kA/3s)'],
-      ['pt.manufacturer','Manufacturer'],
-      ['pt.model','Model'],
-      ['pt.serialNo','Serial No'],
-      ['pt.year','Year'],
+      ['pt.type','Type'],
+      ['pt.specification','Specification'],
+      ['pt.soNo','S.O. No.'],
+      ['pt.manufacturer','Manufacture'],
+      ['pt.year','Year of Manufacture'],
+      ['pt.serialNo','Serial No.'],
+      ['pt.highestSystemVoltageKV','Highest System Voltage (HSV) (kV)'],
+      ['pt.frequencyHz','Frequency (Hz)'],
+      ['pt.insulationLevel','Insulation Level'],
+      ['pt.voltageFactor','Voltage Factor'],
+      ['pt.creepageDistanceMm','Creepage Distance (mm)'],
+      ['pt.totalWeightKg','Total Weight (kg)'],
+      ['pt.oilWeightKg','Oil Weight (kg)'],
+      ['pt.secondaryVoltages','Secondary Voltages'],
+      ['pt.ratedBurdenVA','Rated Burden (VA)'],
+      ['pt.accuracyClass','Accuracy Class'],
+      ['pt.primaryVoltageKV','Primary Voltage (kV)'],
     ],
     CB: [
       ['cb.ratedVoltageKV','Rated Voltage (kV)'],
@@ -155,11 +247,55 @@ export default function NameplateForm({ selection }){
 }
 
 function handleInputChange(path, value, cb){
-  // Convert "true/false" to booleans, numbers if numeric
+  // Convert booleans
+  if (value === 'true') return cb(path, true)
+  if (value === 'false') return cb(path, false)
+
+  // For ICT: cast only known numeric fields; leave others (like insulationLevel) as strings
+  const numericPrefixes = [
+    'ict.powerMVA',
+    'ict.primaryKV','ict.secondaryKV','ict.tertiaryKV',
+    'ict.numPhases','ict.frequencyHz',
+    'ict.ratedVoltageAtNoLoad.hv','ict.ratedVoltageAtNoLoad.iv','ict.ratedVoltageAtNoLoad.lv',
+    'ict.ratedLineCurrent.hv','ict.ratedLineCurrent.iv','ict.ratedLineCurrent.lv',
+    'ict.temperature.maxTempRiseOilC','ict.temperature.maxTempRiseWindingC','ict.temperature.overAmbientTempC',
+    'ict.mass.coreAndWindingsKg','ict.mass.totalMassKg','ict.mass.transportMassKg','ict.mass.untankingMassKg','ict.mass.oilVolumeLiters',
+    'ict.impedanceVoltage.baseMVA',
+    'ict.impedanceVoltage.guaranteed.hv_iv','ict.impedanceVoltage.guaranteed.hv_lv','ict.impedanceVoltage.guaranteed.iv_lv',
+    'ict.impedanceVoltage.measured.hv_iv','ict.impedanceVoltage.measured.hv_lv','ict.impedanceVoltage.measured.iv_lv',
+    'ict.losses.noLoadKW','ict.losses.loadKW','ict.losses.coolerKW',
+    'ict.impedancePercent',
+    // Other equipment generic numeric fields
+    'ct.ratedVoltageKV','ct.ratedCurrentA','ct.burdenVA','ct.shortTimeCurrentKA_3s',
+    'cvt.ratedVoltageKV','cvt.burdenVA',
+    // CT new numeric fields
+    'ct.highestSystemVoltageKV','ct.basicInsulationLevelKVp','ct.ithKA_1s','ct.idynKA',
+    'ct.ratedThermalCurrentA','ct.ratedContinuousCurrentA','ct.ratedExtendedPrimaryCurrentA',
+    'ct.ratedPrimaryCurrentA','ct.ratedSecondaryCurrentA','ct.outputVA','ct.ratedBurdenVA',
+    'ct.creepageDistanceMm','ct.resistanceAt75C_Ohm','ct.kneePointVoltageVk','ct.excitationCurrentAtVk_mA',
+    'ct.oilWeightKg','ct.totalWeightKg',
+    'pt.ratedVoltageKV','pt.ratedCurrentA','pt.burdenVA','pt.shortTimeCurrentKA_3s',
+    // PT new numeric fields
+    'pt.highestSystemVoltageKV','pt.frequencyHz','pt.creepageDistanceMm','pt.totalWeightKg','pt.oilWeightKg','pt.ratedBurdenVA','pt.primaryVoltageKV',
+    'cb.ratedVoltageKV','cb.ratedCurrentA',
+    'isolator.ratedVoltageKV','isolator.ratedCurrentA',
+    'la.ratedVoltageKV','la.energyAbsorptionJ',
+    'busbar.ratedVoltageKV','busbar.ratedCurrentA',
+    'wavetrap.ratedVoltageKV','wavetrap.frequencyHz','wavetrap.impedanceOhm'
+  ]
+
+  const shouldBeNumber = numericPrefixes.some(prefix => path === prefix)
+
   let v = value
-  if (value === 'true') v = true
-  else if (value === 'false') v = false
-  else if (!isNaN(Number(value)) && value.trim() !== '') v = Number(value)
+  if (shouldBeNumber) {
+    // Extract first numeric token (handles values like "12.5% ±10%", "22600 kg", "50 °C")
+    const match = String(value).match(/-?\d+(?:\.\d+)?/)
+    if (match) v = Number(match[0])
+  } else if (!isNaN(Number(value)) && String(value).trim() !== '') {
+    // Plain numeric strings without units
+    v = Number(value)
+  }
+
   cb(path, v)
 }
 

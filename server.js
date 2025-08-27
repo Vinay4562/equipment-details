@@ -46,7 +46,9 @@ app.post('/api/auth/login', (req, res) => {
 app.use('/api/feeders', feederRoutes);
 // Protect equipment write operations
 app.use('/api/equipment', (req, res, next) => {
-  if (req.method === 'POST' || req.method === 'DELETE') return requireAuth(req, res, next);
+  if (req.method === 'POST' || req.method === 'DELETE' || req.method === 'PUT') {
+    return requireAuth(req, res, next);
+  }
   next();
 }, equipmentRoutes); // ✅ singular
 
