@@ -1,26 +1,9 @@
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
 
-const isVercel = !!process.env.VERCEL;
-
-// For Vercel serverless, do NOT write to disk (ephemeral). Use memory and upload to Blob in controller.
-let uploadsDir = null;
-if (!isVercel) {
-  uploadsDir = path.join(process.cwd(), 'server', 'uploads');
-  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const diskStorage = !isVercel && multer.diskStorage({
-  destination: function (_req, _file, cb) { cb(null, uploadsDir); },
-  filename: function (_req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const base = path.basename(file.originalname, ext).replace(/[^a-z0-9]/gi,'_');
-    cb(null, `${Date.now()}_${base}${ext}`);
-  }
-});
-
-const storage = isVercel ? multer.memoryStorage() : diskStorage;
+// Always use in-memory storage to avoid ephemeral disk issues in serverless and ensure
+// we can embed images as data URLs for persistence.
+const storage = multer.memoryStorage();
 
 const allowedExt = new Set(['.jpg', '.jpeg', '.png']);
 const allowedMime = new Set(['image/jpeg', 'image/png']);

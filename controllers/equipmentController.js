@@ -23,19 +23,12 @@ export const createEquipment = async (req, res) => {
       }
     }
 
-    // Determine image URL
+    // Determine image URL (always embed as data URL to avoid ephemeral disk issues)
     let imageUrl;
     if (req.file) {
-      if (process.env.VERCEL) {
-        // On Vercel: you must store persistently (e.g., Vercel Blob). Here we fallback to base64 data URL for now if Blob not configured.
-        // Better: integrate @vercel/blob and store to persistent storage, then set imageUrl to returned public URL.
-        const base64 = req.file.buffer.toString('base64');
-        const mime = req.file.mimetype || 'image/png';
-        imageUrl = `data:${mime};base64,${base64}`;
-      } else {
-        // Local/dev: stored on disk by multer
-        imageUrl = `/uploads/${req.file.filename}`;
-      }
+      const base64 = req.file.buffer?.toString('base64');
+      const mime = req.file.mimetype || 'image/png';
+      if (base64) imageUrl = `data:${mime};base64,${base64}`;
     }
 
     const doc = new Equipment({
@@ -130,13 +123,9 @@ export const updateEquipment = async (req, res) => {
     if (title) update.title = title;
 
     if (req.file) {
-      if (process.env.VERCEL) {
-        const base64 = req.file.buffer.toString('base64');
-        const mime = req.file.mimetype || 'image/png';
-        update.imageUrl = `data:${mime};base64,${base64}`;
-      } else {
-        update.imageUrl = `/uploads/${req.file.filename}`;
-      }
+      const base64 = req.file.buffer?.toString('base64');
+      const mime = req.file.mimetype || 'image/png';
+      if (base64) update.imageUrl = `data:${mime};base64,${base64}`;
     }
 
     if (payload) {
