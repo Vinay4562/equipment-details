@@ -16,6 +16,7 @@ export default function ViewerPage() {
   const [savingEdit, setSavingEdit] = useState(false)
   const [signedIn, setSignedIn] = useState(!!localStorage.getItem('authToken'))
   const [fullImageUrl, setFullImageUrl] = useState(null)
+  const [inactivityTimer, setInactivityTimer] = useState(null)
 
   useEffect(() => {
     (async () => {
@@ -29,12 +30,39 @@ export default function ViewerPage() {
     })()
   }, [selection, q])
 
-  // Keep signed-in state in sync across tabs and after sign-in/sign-out
+  // Keep signed-in state in sync across tabs and on sign-in/out
   useEffect(() => {
     const sync = () => setSignedIn(!!localStorage.getItem('authToken'))
     window.addEventListener('storage', sync)
     return () => window.removeEventListener('storage', sync)
   }, [])
+
+  // Auto sign-out after 2 minutes of inactivity
+  useEffect(() => {
+    if (!signedIn) return
+
+    const resetTimer = () => {
+      if (inactivityTimer) clearTimeout(inactivityTimer)
+      const timer = setTimeout(() => {
+        localStorage.removeItem('authToken')
+        setSignedIn(false)
+        setIsEditing(false)
+        alert('Signed out due to inactivity')
+      }, 2 * 60 * 1000) // 2 minutes
+      setInactivityTimer(timer)
+    }
+
+    // Reset timer on user activity
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
+    events.forEach(event => document.addEventListener(event, resetTimer, true))
+
+    resetTimer() // Start initial timer
+
+    return () => {
+      if (inactivityTimer) clearTimeout(inactivityTimer)
+      events.forEach(event => document.removeEventListener(event, resetTimer, true))
+    }
+  }, [signedIn, inactivityTimer])
 
   // Exit edit mode if signed out
   useEffect(() => {
@@ -57,6 +85,8 @@ export default function ViewerPage() {
       const res = await api.post('/auth/login', { username: ENTRY_USERNAME, password: pwd })
       localStorage.setItem('authToken', res.data.token)
       setSignedIn(true)
+      // Reset inactivity timer on successful login
+      if (inactivityTimer) clearTimeout(inactivityTimer)
       return true
     } catch {
       alert('Authentication failed.')

@@ -4,6 +4,8 @@ import { api, deleteEquipment, ENTRY_USERNAME, resolveUploadUrl } from '../api'
 export default function EquipmentCard({ item, onClick, onDelete }) {
   const [deleting, setDeleting] = useState(false)
   const [signedIn, setSignedIn] = useState(!!localStorage.getItem('authToken'))
+  const [inactivityTimer, setInactivityTimer] = useState(null)
+
   const fields = (() => {
     switch (item.equipmentType) {
       case 'CT':
@@ -123,6 +125,32 @@ export default function EquipmentCard({ item, onClick, onDelete }) {
     window.addEventListener('storage', sync)
     return () => window.removeEventListener('storage', sync)
   }, [])
+
+  // Auto sign-out after 2 minutes of inactivity
+  useEffect(() => {
+    if (!signedIn) return
+
+    const resetTimer = () => {
+      if (inactivityTimer) clearTimeout(inactivityTimer)
+      const timer = setTimeout(() => {
+        localStorage.removeItem('authToken')
+        setSignedIn(false)
+        alert('Signed out due to inactivity')
+      }, 2 * 60 * 1000) // 2 minutes
+      setInactivityTimer(timer)
+    }
+
+    // Reset timer on user activity
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
+    events.forEach(event => document.addEventListener(event, resetTimer, true))
+
+    resetTimer() // Start initial timer
+
+    return () => {
+      if (inactivityTimer) clearTimeout(inactivityTimer)
+      events.forEach(event => document.removeEventListener(event, resetTimer, true))
+    }
+  }, [signedIn, inactivityTimer])
 
   return (
     <div className="relative group">
